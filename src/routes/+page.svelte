@@ -1,7 +1,59 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
-    // const activeLetter = document.getElementById("activeLetter");
+    import words from 'an-array-of-english-words';
+
+
+    // function getLetterCounts() {
+    //     let letters = []
+    //     for (let word of words) {
+    //         for (let letter of word) {
+    //             letters.push(letter)
+    //         }
+    //     }
+    //     let letterCounts: Record<string, number> = {};
+    //     for (let alpha of alphabet) {
+    //         letterCounts[alpha.toLowerCase()] = 0;
+    //     }
+    //     for (let letter of letters) {
+    //         letterCounts[letter.toLowerCase()] += 1;
+    //     }
+    //     console.log(letterCounts);
+    //     return letterCounts;
+    // }
+
+    const letterCounts: Record<string, number> = {a:195832, b:46410, c: 102513,d: 83935,e: 286167,f: 29721,g: 69952,h: 63210,i: 231005,j: 4102,k: 22654,l: 132826
+                        ,m: 73474,n: 171212,o: 169403,p: 76416,q: 4200,r: 176849,s: 244618,t: 166977,u: 83479,v: 23437,w:18657,x: 7098 ,y: 41314,z: 12299}
+
+    function sumArray(numbers: number[]): number {
+        return numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    }
     
+    function letterProbs() {
+        let allProbs: Record<string, number> = {};
+        const allCounts = Object.values(letterCounts);
+        const sumCounts = sumArray(allCounts);
+        let totalProbs = 0;
+        for (let letterKey of Object.keys(letterCounts)) {
+            totalProbs += letterCounts[letterKey] / sumCounts;
+            allProbs[letterKey] = totalProbs;
+        }
+        console.log(allProbs);
+        return allProbs;
+    }
+
+    const alphaProbs = letterProbs();
+
+    function getRandomLetter() {
+        const rand = Math.random();
+        for (let letterKey of Object.keys(alphaProbs)) {
+            if (rand < alphaProbs[letterKey]) {
+                return letterKey.toUpperCase();
+            }
+        }
+        return 'z'.toUpperCase();
+    }
+
+    // const activeLetter = document.getElementById("activeLetter");
     // activeLetter?.style.left
     let x = 0;
     let y = 0;
@@ -11,13 +63,11 @@
     const gameHeight = 600;
     const rows = (gameHeight / letterSize);
     const cols = (gameWidth / letterSize);
-    const gameWidthString = `max-w-[${gameWidth}px]`;
-    const gameHeightString = `h-[${gameHeight}px]`;
     let activeLetter = 0;
     let activeLetterText = '';
     let lastMove = 0;
     let gameSpeed = 10;
-    let gameInterval: number;
+    let gameInterval: ReturnType<typeof setInterval>;
     let gameGrid: string[][] = [];
     let columnDepths: number[] = [];
     let currentColumn = 0;
@@ -57,7 +107,7 @@
         activeLetter = letterLocs.length - 1;
         const gameBox = document.getElementById('gameBox');
         const divElement = document.createElement('div');
-        activeLetterText = alphabet[Math.floor(Math.random() * alphabet.length)]
+        activeLetterText = getRandomLetter();
         divElement.textContent = activeLetterText;
         divElement.style.position = 'absolute';
         divElement.style.backgroundColor = '#fef9c3';
@@ -137,22 +187,27 @@
     }
 
     function resetGame() {
+        console.log(letterProbs());
         clearInterval(gameInterval);
         gameInterval = setInterval(() => {
             if (!checkColumnDepths()) {
                 gameOn = false;
                 clearInterval(gameInterval);
             }
+            // check if enough time has passed since last interval, based on game speed.
             if (Date.now() > lastMove + gameSpeed) {
+                // check if the current letter is at the bottom of a column
                 if (letterLocs[activeLetter][1] < (columnDepths[currentColumn] -1) * letterSize) {
                     letterLocs[activeLetter][1] += 1;
                     letters[activeLetter].style.top = `${letterLocs[activeLetter][1]}px`;
                     lastMove = Date.now();
                 } else {
+                    // add to the gamegrid and switch to a new letter
                     gameGrid[columnDepths[currentColumn] - 1][currentColumn] = activeLetterText;
                     const foundNewWords = findAllNewWords(columnDepths[currentColumn] - 1, currentColumn);
                     columnDepths[currentColumn] -= 1;
                     console.log("words: ", foundNewWords);
+                    colorWordLetters(foundNewWords);
                     createLetter();
                     lastMove = Date.now();
                 }
@@ -160,33 +215,39 @@
         }, 10)
     }
 
-    const wordList = [
-    'act', 'add', 'age', 'aim', 'air', 'all', 'and', 'any', 'ape', 'arc', 'are', 
-    'arm', 'art', 'ask', 'ate', 'bag', 'bar', 'bat', 'bed', 'beg', 'bet', 'bid', 
-    'big', 'bin', 'bit', 'bog', 'bow', 'box', 'boy', 'bud', 'bug', 'bun', 'bus', 
-    'but', 'buy', 'cab', 'cap', 'car', 'cat', 'cow', 'cry', 'cub', 'cup', 'cut', 
-    'day', 'dew', 'dig', 'dim', 'dip', 'dog', 'dot', 'dry', 'due', 'dye', 'ear', 
-    'eat', 'eel', 'egg', 'end', 'far', 'fat', 'fax', 'fig', 'fin', 'fit', 'fix', 
-    'fly', 'fog', 'for', 'fun', 'fur', 'gap', 'gas', 'get', 'gig', 'god', 'got', 
-    'gum', 'gun', 'gut', 'gym', 'hat', 'hay', 'hem', 'her', 'him', 'hip', 'hit', 
-    'hog', 'hop', 'hot', 'hug', 'hut', 'ice', 'icy', 'ink', 'inn', 'ion', 'its', 
-    'jam', 'jar', 'jet', 'jig', 'job', 'jog', 'joy', 'key', 'kid', 'kit', 'lab', 
-    'lap', 'law', 'lay', 'leg', 'let', 'lip', 'log', 'lot', 'low', 'mad', 'man', 
-    'map', 'mat', 'mix', 'mob', 'mop', 'mud', 'mug', 'nap', 'net', 'new', 'nod', 
-    'not', 'now', 'nut', 'oak', 'odd', 'off', 'oil', 'old', 'one', 'our', 'out', 
-    'owl', 'pad', 'pan', 'pat', 'paw', 'pay', 'pen', 'pet', 'pie', 'pig', 'pin', 
-    'pit', 'pop', 'pot', 'put', 'rag', 'ram', 'ran', 'rat', 'red', 'rib', 'rid', 
-    'rig', 'rim', 'rip', 'rod', 'rot', 'row', 'rug', 'run', 'sad', 'sag', 'sap', 
-    'sat', 'saw', 'say', 'sea', 'see', 'set', 'sew', 'she', 'shy', 'sip', 'sit', 
-    'sky', 'sob', 'son', 'sow', 'sun', 'tab', 'tan', 'tap', 'tar', 'tax', 'tea', 
-    'tie', 'tin', 'tip', 'top', 'toy', 'try', 'tub', 'two', 'use', 'van', 'vet', 
-    'vow', 'war', 'was', 'wax', 'way', 'web', 'wet', 'who', 'why', 'wig', 'win', 
-    'wow', 'yes', 'yet', 'you', 'zoo'
-    ];
-
     type foundWordType = {
         [key: string]: number[][];
     }
+
+    function colorWordLetters(foundWords: foundWordType) {
+        for (let key of Object.keys(foundWords)) {
+            const wordCoords = foundWords[key];
+            console.log(wordCoords, letterLocs);
+            for (let coords of wordCoords) {
+                for (let i in letterLocs) {
+                    if (arraysEqual(letterLocs[i], coords)) {
+                        letters[i].style.backgroundColor = 'orange';
+                    }
+                }
+                letters[letters.length -1].remove();
+            }
+        }
+    }
+
+    // Function to check if two arrays are equal
+    function arraysEqual(arr1: number[], arr2: number[]): boolean {
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) {
+        return false;
+        }
+    }
+    return true;
+    }
+
+
 
     function findAllNewWords(startRow: number, startCol: number) {
         let foundWords: foundWordType = {};
@@ -196,12 +257,11 @@
                 if (gameGrid[startRow][i] === '.') break;
                 currentWord += gameGrid[startRow][i];
                 if (i < startCol) continue;
-                console.log("currentWord: ", currentWord);
-                if (wordList.includes(currentWord.toLowerCase())) {
+                if (currentWord.length > 2 && words.includes(currentWord.toLowerCase())) {
                     console.log('found a valid Word!', currentWord);
                     foundWords[currentWord] = [];
-                    for (let j = startCol; j <= i; j++) {
-                        foundWords[currentWord].push([startRow, j])
+                    for (let j = s; j <= i; j++) {
+                        foundWords[currentWord].push([j * letterSize, startRow * letterSize])
                     }
                     
                 } 
