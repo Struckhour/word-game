@@ -207,7 +207,8 @@
                     const foundNewWords = findAllNewWords(columnDepths[currentColumn] - 1, currentColumn);
                     columnDepths[currentColumn] -= 1;
                     console.log("words: ", foundNewWords);
-                    colorWordLetters(foundNewWords);
+                    const redLetters = colorWordLetters(foundNewWords);
+                    updateBoard(redLetters);
                     createLetter();
                     lastMove = Date.now();
                 }
@@ -220,18 +221,20 @@
     }
 
     function colorWordLetters(foundWords: foundWordType) {
+        let redLetters = [];
         for (let key of Object.keys(foundWords)) {
             const wordCoords = foundWords[key];
             console.log(wordCoords, letterLocs);
             for (let coords of wordCoords) {
                 for (let i in letterLocs) {
                     if (arraysEqual(letterLocs[i], coords)) {
+                        redLetters.push(parseInt(i));
                         letters[i].style.backgroundColor = 'orange';
                     }
                 }
-                letters[letters.length -1].remove();
             }
         }
+        return redLetters.sort((a, b) => b - a);
     }
 
     // Function to check if two arrays are equal
@@ -269,8 +272,80 @@
         }
         return foundWords;
     }
+
+    function countDeletesUnderLetter(grid: string[][]) {
+        let dropGrid: number[][] = [];
+        for (let row in grid) {
+            let newRow = [];
+            for (let col in grid[row]) {
+                if (grid[row][col] !== '.' && grid[row][col] !== 'del') {
+                    let count = 0;
+                    for (let i = parseInt(row) + 1; i < rows; i++) {
+                        if (grid[i][col] == 'del') {
+                            count += 1;
+                        }
+                    }
+                    newRow.push(count)
+
+                } else {
+                    newRow.push(0);
+                }
+            }
+            dropGrid.push(newRow)
+        }
+        return dropGrid;
+    }
+
+    function addDeletesToGrid(indexes: number[]) {
+        let newGrid: string[][] = [];
+        for (let row in gameGrid) {
+            let newRow: string[] = [];
+            for (let col in gameGrid[row]) {
+                let match = false;
+                for (let i of indexes) {
+                    if (arraysEqual(letterLocs[i], [parseInt(col) * letterSize, parseInt(row) * letterSize])) {
+                        newRow.push('del');
+                        match = true;
+                        break;
+                    }     
+                }
+                if (!match) newRow.push(gameGrid[parseInt(row)][parseInt(col)]);
+            }
+            newGrid.push(newRow);
+        }
+        return newGrid;
+    }
+
+    function dropLetters(dropGrid: number[][]) {
+        let droppedGrid:string[][] = JSON.parse(JSON.stringify(gameGrid));
+        for (let row in dropGrid) {
+            for (let col in dropGrid[row]) {
+                if (dropGrid[row][col] !== 0) {
+                    for (let i in letterLocs) {
+                        gameGrid[row][col]
+                        if (arraysEqual(letterLocs[i], [parseInt(col) * letterSize, parseInt(row) * letterSize])) {
+                            const newTopLocation = parseInt(row) * letterSize + dropGrid[row][col] * letterSize;
+                            letters[i].style.top = `${newTopLocation}px`;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function updateBoard(indexes: number[]) {
+        const deleteGrid = addDeletesToGrid(indexes);
+        console.log(deleteGrid);
+        const dropGrid = countDeletesUnderLetter(deleteGrid);
+        console.log(dropGrid);
+        for (let index of indexes) {
+            letters[index].remove();
+        }
+        dropLetters(dropGrid);
+
+    }
 </script>
-<body class="w-full h-screen max-h-screen bg-slate-500">
+<body class="w-screen max-w-[800px] mx-auto h-screen max-h-screen bg-slate-500">
 
     <h1 class="text-center text-4xl pt-8 text-blue-200 w-2/4 m-auto">Letter Game</h1>
     <button on:click={startGame} class="block text-center text-4xl px-2 text-black bg-blue-200 mx-auto border border-black">Start</button>
