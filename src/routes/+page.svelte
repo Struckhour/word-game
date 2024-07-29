@@ -64,7 +64,7 @@
     const gameHeight = 600;
     const rows = (gameHeight / letterSize);
     const cols = (gameWidth / letterSize);
-    let activeLetter = 0;
+    let activePosition: number[] = [];
     let activeLetterText = '';
     let lastMove = 0;
     let gameSpeed = 10;
@@ -73,7 +73,8 @@
     let columnDepths: number[] = [];
     let currentColumn = 0;
     let gameOn = false;
-
+    let letterDivGrid: (HTMLDivElement | null)[][] = [];
+    let activeLetter: HTMLDivElement;
 
     function updateColumnDepths() {
         columnDepths = [];
@@ -101,34 +102,41 @@
         }
     }
 
+    function buildDivGrid() {
+        letterDivGrid = [];
+        for (let i = 0; i < rows; i++) {
+            let currentRow = [];
+            for (let j = 0; j < cols; j++) {
+                currentRow.push(null)
+            }
+            letterDivGrid.push(currentRow);
+        }
+    }
 
     const alphabet: string[] = [
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
         'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     ];
-    let letterLocs:number[][] = [];
-    let letters: HTMLDivElement[] = [];
+
 
 // Function to handle div creation
-    const createLetter = () => {
-        letterLocs.push([4 * letterSize, 0]);
+    const createActiveLetter = () => {
+        
+        activePosition = [4 * letterSize, 0];
         currentColumn = 4;
-        activeLetter = letterLocs.length - 1;
         const gameBox = document.getElementById('gameBox');
-        const divElement = document.createElement('div');
+        activeLetter = document.createElement('div');
         activeLetterText = getRandomLetter();
-        divElement.textContent = activeLetterText;
-        divElement.style.position = 'absolute';
-        divElement.style.backgroundColor = '#fef9c3';
-        divElement.style.width = `${letterSize}px`;
-        divElement.style.height = `${letterSize}px`;
-        divElement.style.top = `${letterLocs[activeLetter][1]}px`;
-        divElement.style.left = `${letterLocs[activeLetter][0]}px`;
-        divElement.style.border = 'black 1px solid';
-        divElement.style.textAlign = 'center';
-
-        letters.push(divElement);
-        if (gameBox) gameBox.appendChild(divElement);
+        activeLetter.textContent = activeLetterText;
+        activeLetter.style.position = 'absolute';
+        activeLetter.style.backgroundColor = '#fef9c3';
+        activeLetter.style.width = `${letterSize}px`;
+        activeLetter.style.height = `${letterSize}px`;
+        activeLetter.style.top = `${activePosition[1]}px`;
+        activeLetter.style.left = `${activePosition[0]}px`;
+        activeLetter.style.border = 'black 1px solid';
+        activeLetter.style.textAlign = 'center';
+        if (gameBox) gameBox.appendChild(activeLetter);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -138,23 +146,23 @@
                 case "ArrowUp":
                     break;
                 case "ArrowDown":
-                    if(letterLocs[activeLetter][1]< (columnDepths[currentColumn] -1) * letterSize) {
-                        letterLocs[activeLetter][1] = (columnDepths[currentColumn] -1) * letterSize;
-                        letters[activeLetter].style.top = `${letterLocs[activeLetter][1]}px`;
+                    if(activePosition[1]< (columnDepths[currentColumn] -1) * letterSize) {
+                        activePosition[1] = (columnDepths[currentColumn] -1) * letterSize;
+                        activeLetter.style.top = `${activePosition[1]}px`;
                         // columnDepths[currentColumn] -= 1;
                     }
                     break;
                 case "ArrowLeft":
-                    if(letterLocs[activeLetter][0] > 0) {
-                        letterLocs[activeLetter][0] -= step;
-                        letters[activeLetter].style.left = `${letterLocs[activeLetter][0]}px`;
+                    if(activePosition[0] > 0) {
+                        activePosition[0] -= step;
+                        activeLetter.style.left = `${activePosition[0]}px`;
                         currentColumn -= 1;
                     }
                     break;
                 case "ArrowRight":
-                    if (letterLocs[activeLetter][0]< gameWidth - letterSize) {
-                        letterLocs[activeLetter][0] += step;
-                        letters[activeLetter].style.left = `${letterLocs[activeLetter][0]}px`;
+                    if (activePosition[0]< gameWidth - letterSize) {
+                        activePosition[0] += step;
+                        activeLetter.style.left = `${activePosition[0]}px`;
                         currentColumn += 1;
                     }
                     break;
@@ -180,10 +188,11 @@
         const gameBox = document.getElementById('gameBox');
         if (gameBox) gameBox.innerHTML = '';
         buildGameGrid();
+        buildDivGrid();
         updateColumnDepths();
         console.log(columnDepths);
         console.log(gameGrid);
-        createLetter();
+        createActiveLetter();
         resetGame();
     }
 
@@ -209,21 +218,30 @@
             // check if enough time has passed since last interval, based on game speed.
             if (Date.now() > lastMove + gameSpeed) {
                 // check if the current letter is at the bottom of a column
-                if (letterLocs[activeLetter][1] < (columnDepths[currentColumn] -1) * letterSize) {
-                    letterLocs[activeLetter][1] += 1;
-                    letters[activeLetter].style.top = `${letterLocs[activeLetter][1]}px`;
+                if (activePosition[1] < (columnDepths[currentColumn] -1) * letterSize) {
+                    activePosition[1] += 1;
+                    activeLetter.style.top = `${activePosition[1]}px`;
                     lastMove = Date.now();
                 } else {
                     // add to the gamegrid and switch to a new letter
+                    const activeRow = Math.round(activePosition[1] / letterSize);
+                    const activeCol = Math.round(activePosition[0] / letterSize);
+                    const copiedLetterDiv = activeLetter.cloneNode(true) as HTMLDivElement;
+                    letterDivGrid[activeRow][activeCol] = copiedLetterDiv;
+                    const gameBox = document.getElementById('gameBox');
+                    if (gameBox) gameBox.appendChild(copiedLetterDiv);
+                    activeLetter.remove();
                     gameGrid[columnDepths[currentColumn] - 1][currentColumn] = activeLetterText;
                     const foundNewWords = findAllNewWords(columnDepths[currentColumn] - 1, currentColumn);
                     columnDepths[currentColumn] -= 1;
-                    console.log("words: ", foundNewWords);
                     const redLetters = colorWordLetters(foundNewWords);
                     if (redLetters.length > 0) {
+                        console.log("words: ", foundNewWords);
                         updateBoard(redLetters);
                     }
-                    createLetter();
+                    console.log(letterDivGrid);
+                    console.log(gameGrid);
+                    createActiveLetter();
                     lastMove = Date.now();
                 }
             }
@@ -235,20 +253,17 @@
     }
 
     function colorWordLetters(foundWords: foundWordType) {
-        let redLetters = [];
-        let allCoords = []
+        let redLetterCoords = [];
         for (let key of Object.keys(foundWords)) {
             const wordCoords = foundWords[key];
             for (let coords of wordCoords) {
-                for (let i in letterLocs) {
-                    if (arraysEqual(letterLocs[i], coords)) {
-                        redLetters.push(parseInt(i));
-                        letters[i].style.backgroundColor = 'orange';
-                    }
-                }
+                redLetterCoords.push([coords[0], coords[1]]);
+                const thisDiv = letterDivGrid[coords[0]][coords[1]];
+                if (thisDiv) thisDiv.style.backgroundColor = 'orange';
+
             }
         }
-        return redLetters.sort((a, b) => b - a);
+        return redLetterCoords;
     }
 
     // Function to check if two arrays are equal
@@ -264,67 +279,7 @@
     return true;
     }
 
-// FIX THE REDLETTER FUNCTION SO THAT IT ONLY HAS ONE OF EACH INDEX TO DELETE
-// 
-// 
-// ###########################################################################################################333
 
-
-
-
-// ###########################################################################################################333
-
-
-
-
-
-
-
-
-
-// ###########################################################################################################333
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ###########################################################################################################333
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ###########################################################################################################333
     function findAllNewWords(startRow: number, startCol: number) {
         let foundWords: foundWordType = {};
         for (let s = 0; s <= startCol; s++){
@@ -337,7 +292,7 @@
                     console.log('found a valid Word!', currentWord);
                     foundWords[currentWord] = [];
                     for (let j = s; j <= i; j++) {
-                        foundWords[currentWord].push([j * letterSize, startRow * letterSize])
+                        foundWords[currentWord].push([startRow, j])
                     }
                     
                 } 
@@ -373,24 +328,10 @@
         return dropGrid;
     }
 
-    function addDeletesToGrid(indexes: number[]) {
-        let newGrid: string[][] = [];
-        for (let row in gameGrid) {
-            let newRow: string[] = [];
-            for (let col in gameGrid[row]) {
-                let match = false;
-                for (let i of indexes) {
-                    if (arraysEqual(letterLocs[i], [parseInt(col) * letterSize, parseInt(row) * letterSize])) {
-                        newRow.push('del');
-                        match = true;
-                        break;
-                    }     
-                }
-                if (!match) newRow.push(gameGrid[parseInt(row)][parseInt(col)]);
-            }
-            newGrid.push(newRow);
+    function addDeletesToGrid(coords: number[][]) {
+        for (let coord of coords) {
+            gameGrid[coord[0]][coord[1]] = 'del';
         }
-        return newGrid;
     }
 
     function dropLetters(dropGrid: number[][]) {
@@ -401,35 +342,44 @@
                 if (dropGrid[r][c] !== 0) {
                     // check if this is a cell where letters should drop
                     if (dropGrid[r][c] > 0) {
+                        // update the gameGrid
                         const drops = dropGrid[r][c];
                         droppedGrid[r + drops][c] = gameGrid[r][c];
                         droppedGrid[r][c] = '.';
-                        for (let i in letterLocs) {
-                            if (arraysEqual(letterLocs[i], [c * letterSize, r * letterSize])) {
-                                const newTopLocation = r * letterSize + dropGrid[r][c] * letterSize;
-                                letters[i].style.top = `${newTopLocation}px`;
-                            }
+
+                        // update the actual divGrid
+                        const newTopLocation = r * letterSize + dropGrid[r][c] * letterSize;
+                        const thisDiv = letterDivGrid[r][c];
+                        if (thisDiv) {
+                            const deepCopiedDiv = thisDiv.cloneNode(true) as HTMLDivElement;
+                            const gameBox = document.getElementById('gameBox');
+                            if (gameBox) gameBox.appendChild(deepCopiedDiv);
+                            deepCopiedDiv.style.top = `${newTopLocation}px`;
+                            letterDivGrid[r + drops][c] = deepCopiedDiv;
+                            thisDiv.remove();
+                            letterDivGrid[r][c] = null;
                         }
-                    // these are cells where letters should be deleted
+
                     } else {
                         droppedGrid[r][c] = '.';
+                        const thisDiv = letterDivGrid[r][c];
+                        if (thisDiv) {
+                            thisDiv.remove()
+                            letterDivGrid[r][c] = null;
+                        }
                     }
+                    // these are cells where letters should be deleted
+
                 }
             }
         }
         gameGrid = droppedGrid;
-        console.log("gameGrid after dropping: ", gameGrid);
     }
 
-    function updateBoard(indexes: number[]) {
-        const deleteGrid = addDeletesToGrid(indexes);
-        console.log("delete grid:", deleteGrid);
-        const dropGrid = countDeletesUnderLetter(deleteGrid);
-        console.log(dropGrid);
-        for (let index of indexes) {
-            console.log("letter div about to be deleted", letters[index]);
-            letters[index].remove();
-        }
+    function updateBoard(indexes: number[][]) {
+        addDeletesToGrid(indexes);
+        console.log("delete grid:", gameGrid);
+        const dropGrid = countDeletesUnderLetter(gameGrid);
         dropLetters(dropGrid);
         updateColumnDepths();
     }
