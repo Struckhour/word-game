@@ -463,18 +463,19 @@
     <h1 class="text-center text-4xl pt-8 text-blue-200 w-2/4 m-auto">Letter Game</h1>
     <button on:click={startGame} class="block text-center text-4xl px-2 text-black bg-blue-200 mx-auto border border-black rounded-lg hover:bg-blue-300 active:bg-blue-400">Start</button>
     <div id="gameBoxContainer" class="relative inline-flex top-[10px] max-w-[800px] w-full h-[600px] text-6xl">
-
+        <div id="nextBox" class="relative ml-4 flex flex-col justify-between bg-slate-900 w-[80px] h-[600px] text-6xl py-4 outline outline-4 outline-slate-300">
+        </div>
         <div id="gameBox" class="relative bg-slate-900 min-w-[540px] max-w-[540px] mx-auto w-full h-[600px] text-6xl outline outline-4 outline-slate-300">
             
         </div>
-        <div id="nextBox" class="relative flex flex-col justify-between bg-slate-900 w-[80px] h-[600px] ml-0 text-6xl py-4 outline outline-4 outline-slate-300">
+        <div id="nextBox" class="relative flex flex-col justify-between bg-slate-900 w-[80px] h-[600px] mr-4 text-6xl py-4 outline outline-4 outline-slate-300">
 
-            <div id="next1" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
+            <div id="next1" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-80 mx-auto text-center"></div>
             <div id="next2" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
-            <div id="next3" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
-            <div id="next4" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
-            <div id="next5" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
-            <div id="next6" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
+            <div id="next3" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-60 mx-auto text-center"></div>
+            <div id="next4" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-50 mx-auto text-center"></div>
+            <div id="next5" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-40 mx-auto text-center"></div>
+            <div id="next6" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-30 mx-auto text-center"></div>
 
         </div>
     </div>
