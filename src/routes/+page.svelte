@@ -55,6 +55,7 @@
 
     // const activeLetter = document.getElementById("activeLetter");
     // activeLetter?.style.left
+    let fresh = true;
     let x = 0;
     let y = 0;
     const step = 60;
@@ -74,10 +75,18 @@
     let gameOn = false;
 
 
-    function buildColumnDepths() {
+    function updateColumnDepths() {
         columnDepths = [];
-        for (let i = 0; i < cols; i++) {
-            columnDepths.push(rows);
+        for (let col in gameGrid[0]) {
+            let colCount = 0;
+            for (let row in gameGrid) {
+                if (gameGrid[row][col] === '.') {
+                    colCount += 1;
+                } else {
+                    break;
+                }
+            }
+        columnDepths.push(colCount);
         }
     }
 
@@ -166,11 +175,12 @@
     })
 
     function startGame() {
+        fresh = false;
         gameOn = true;
         const gameBox = document.getElementById('gameBox');
         if (gameBox) gameBox.innerHTML = '';
         buildGameGrid();
-        buildColumnDepths();
+        updateColumnDepths();
         console.log(columnDepths);
         console.log(gameGrid);
         createLetter();
@@ -185,6 +195,8 @@
         }
         return true;
     }
+
+
 
     function resetGame() {
         console.log(letterProbs());
@@ -208,7 +220,9 @@
                     columnDepths[currentColumn] -= 1;
                     console.log("words: ", foundNewWords);
                     const redLetters = colorWordLetters(foundNewWords);
-                    updateBoard(redLetters);
+                    if (redLetters.length > 0) {
+                        updateBoard(redLetters);
+                    }
                     createLetter();
                     lastMove = Date.now();
                 }
@@ -222,9 +236,9 @@
 
     function colorWordLetters(foundWords: foundWordType) {
         let redLetters = [];
+        let allCoords = []
         for (let key of Object.keys(foundWords)) {
             const wordCoords = foundWords[key];
-            console.log(wordCoords, letterLocs);
             for (let coords of wordCoords) {
                 for (let i in letterLocs) {
                     if (arraysEqual(letterLocs[i], coords)) {
@@ -250,8 +264,67 @@
     return true;
     }
 
+// FIX THE REDLETTER FUNCTION SO THAT IT ONLY HAS ONE OF EACH INDEX TO DELETE
+// 
+// 
+// ###########################################################################################################333
 
 
+
+
+// ###########################################################################################################333
+
+
+
+
+
+
+
+
+
+// ###########################################################################################################333
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ###########################################################################################################333
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ###########################################################################################################333
     function findAllNewWords(startRow: number, startCol: number) {
         let foundWords: foundWordType = {};
         for (let s = 0; s <= startCol; s++){
@@ -278,14 +351,18 @@
         for (let row in grid) {
             let newRow = [];
             for (let col in grid[row]) {
-                if (grid[row][col] !== '.' && grid[row][col] !== 'del') {
-                    let count = 0;
-                    for (let i = parseInt(row) + 1; i < rows; i++) {
-                        if (grid[i][col] == 'del') {
-                            count += 1;
+                if (grid[row][col] !== '.') {
+                    if (grid[row][col] !== 'del') {
+                        let count = 0;
+                        for (let i = parseInt(row) + 1; i < rows; i++) {
+                            if (grid[i][col] == 'del') {
+                                count += 1;
+                            }
                         }
+                        newRow.push(count);
+                    } else {
+                        newRow.push(-1);
                     }
-                    newRow.push(count)
 
                 } else {
                     newRow.push(0);
@@ -317,32 +394,44 @@
     }
 
     function dropLetters(dropGrid: number[][]) {
+        console.log("drop grid: ", dropGrid);
         let droppedGrid:string[][] = JSON.parse(JSON.stringify(gameGrid));
-        for (let row in dropGrid) {
-            for (let col in dropGrid[row]) {
-                if (dropGrid[row][col] !== 0) {
-                    for (let i in letterLocs) {
-                        gameGrid[row][col]
-                        if (arraysEqual(letterLocs[i], [parseInt(col) * letterSize, parseInt(row) * letterSize])) {
-                            const newTopLocation = parseInt(row) * letterSize + dropGrid[row][col] * letterSize;
-                            letters[i].style.top = `${newTopLocation}px`;
+        for (let r = dropGrid.length -1; r >= 0; r--) {
+            for (let c = 0; c < dropGrid[r].length; c++) {
+                if (dropGrid[r][c] !== 0) {
+                    // check if this is a cell where letters should drop
+                    if (dropGrid[r][c] > 0) {
+                        const drops = dropGrid[r][c];
+                        droppedGrid[r + drops][c] = gameGrid[r][c];
+                        droppedGrid[r][c] = '.';
+                        for (let i in letterLocs) {
+                            if (arraysEqual(letterLocs[i], [c * letterSize, r * letterSize])) {
+                                const newTopLocation = r * letterSize + dropGrid[r][c] * letterSize;
+                                letters[i].style.top = `${newTopLocation}px`;
+                            }
                         }
+                    // these are cells where letters should be deleted
+                    } else {
+                        droppedGrid[r][c] = '.';
                     }
                 }
             }
         }
+        gameGrid = droppedGrid;
+        console.log("gameGrid after dropping: ", gameGrid);
     }
 
     function updateBoard(indexes: number[]) {
         const deleteGrid = addDeletesToGrid(indexes);
-        console.log(deleteGrid);
+        console.log("delete grid:", deleteGrid);
         const dropGrid = countDeletesUnderLetter(deleteGrid);
         console.log(dropGrid);
         for (let index of indexes) {
+            console.log("letter div about to be deleted", letters[index]);
             letters[index].remove();
         }
         dropLetters(dropGrid);
-
+        updateColumnDepths();
     }
 </script>
 <body class="w-screen max-w-[800px] mx-auto h-screen max-h-screen bg-slate-500">
@@ -352,7 +441,7 @@
     <div id="gameBox" class="relative top-[10px] bg-slate-900 max-w-[540px] w-full h-[600px] m-auto text-6xl outline outline-4 outline-slate-300">
 
     </div>
-    {#if !gameOn}
+    {#if !gameOn && !fresh}
     <div class="absolute top-[300px] left-2/4 -translate-x-2/4 border border-black bg-red-500 text-black text-4xl px-4">Game Over</div>
     {/if}
 </body>
