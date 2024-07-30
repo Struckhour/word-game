@@ -652,3 +652,9 @@
         Our system has detected possible cheating. A company representative has been dispatched to the IP affiliated with this account: [North Okanagan Youth and Family Services]. If, after thorough inspection, Agent B. Childress confirms your full compliance, no further action will be required. Otherwise you will be rigorousl>>></div>
     {/if}
 </body>
+
+<style>
+    html, body {
+      touch-action: manipulation;
+    }
+</style>
