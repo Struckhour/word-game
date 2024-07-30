@@ -3,6 +3,7 @@
     // import words from 'an-array-of-english-words';
 
     import lordWords from '$lib/lordWords.json';
+  import { fly } from "svelte/transition";
 
 
     // let uniqueWords: string[] = [];
@@ -53,10 +54,10 @@
     //     m: 73474,n: 171212,o: 169403,p: 76416,q: 4200,r: 176849,s: 244618,t: 166977,u: 83479,v: 23437,w:18657,x: 7098 ,y: 41314,z: 12299
     //  }
 
-
+    const vowelMultiplier = 1.5;
     const shortLetterCounts: Record<string, number> = {
-        a:8387*2, b: 2317,c: 2657,d: 3388,e: 8980*2,f: 1677,g: 2381,h: 2481,i: 5196*2,j: 458,k: 2225,l: 4563
-        ,m: 2817,n: 4037,o: 6418*2,p: 2887,q: 136,r: 5436,s: 8604,t: 4551,u: 3595*2,v: 954,w: 1606,x: 412,y: 2780,z: 628
+        a:8387*vowelMultiplier, b: 2317,c: 2657,d: 3388,e: 8980*vowelMultiplier,f: 1677,g: 2381,h: 2481,i: 5196*vowelMultiplier,j: 458,k: 2225,l: 4563
+        ,m: 2817,n: 4037,o: 6418*vowelMultiplier,p: 2887,q: 136,r: 5436,s: 8604,t: 4551,u: 3595*vowelMultiplier,v: 954,w: 1606,x: 412,y: 2780,z: 628
     }
 
     function sumArray(numbers: number[]): number {
@@ -95,10 +96,8 @@
     let y = 0;
     const step = 11.11;
     const letterWidth = 11.11;
-    const letterHeight = 10;
-    const gameWidth = 540;
-    const gameHeight = 600;
-    const rows = 10;
+    const letterHeight = 9.09;
+    const rows = 11;
     const cols = 9;
     let activePosition: number[] = [];
     let activeLetterText = '';
@@ -113,6 +112,11 @@
     let activeLetter: HTMLDivElement;
     let nextLetters: string[] = [];
     let gameOver = false;
+    let allFoundWords: string[] = [];
+    let foundWordDivs: HTMLDivElement[] = [];
+    let score = 0;
+    let showMenu = false;
+
 
     function buildNextLetters() {
         for (let i = 0; i < 6; i++) {
@@ -320,6 +324,9 @@
                     columnDepths[currentColumn] -= 1;
                     const redLetters = colorWordLetters(foundNewWords);
                     if (redLetters.length > 0) {
+                        addWordDivs(Object.keys(foundNewWords));
+                        allFoundWords = allFoundWords.concat(Object.keys(foundNewWords));
+                        updateScore(Object.keys(foundNewWords));
                         console.log("words: ", foundNewWords);
                         updateBoard(redLetters);
                     }
@@ -332,6 +339,12 @@
                 }
             }
         }, 10)
+    }
+
+    function updateScore(wordList: string[]) {
+        for (let word of wordList) {
+            score += word.length;
+        }
     }
 
     type foundWordType = {
@@ -405,6 +418,20 @@
 
 
         return foundWords;
+    }
+
+    function addWordDivs(newWords: string[]) {
+        for (let word of newWords) {
+            const pastWords = document.getElementById('pastWords');
+            let wordDiv = document.createElement('div');
+            wordDiv.textContent = word;
+            foundWordDivs.push(wordDiv)
+            if (foundWordDivs.length > 15) {
+                foundWordDivs[0].remove();
+                foundWordDivs.shift();
+            }
+            if (pastWords) pastWords.appendChild(wordDiv);
+        }
     }
 
     function countDeletesUnderLetter(grid: string[][]) {
@@ -490,29 +517,49 @@
         updateColumnDepths();
     }
 </script>
-<body class="w-screen max-w-[800px] mx-auto h-screen max-h-screen bg-green-950 bg-opacity-60">
-
-    <h1 class="text-center text-4xl pt-4 text-blue-200 w-2/4 m-auto">Entris</h1>
-    {#if !gameOn}
-    <button on:click={startGame} class="block text-center text-4xl px-2 text-black bg-blue-200 mx-auto border border-black rounded-lg hover:bg-blue-300 active:bg-blue-400">Start</button>
-    {:else}
-    <button on:click={startGame} class="block text-center text-4xl px-2 text-black bg-blue-200 mx-auto border border-black rounded-lg hover:bg-blue-300 active:bg-blue-400">Pause</button>
+<body class="overflow-hidden relative w-screen max-w-[800px] mx-auto h-full min-h-screen bg-green-950 bg-opacity-60">
+    {#if showMenu}
+    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[400px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
+        <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-black hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
+        <ul class="text-xl list-disc list-inside ml-4 mt-4 text-blue-200">
+            <li>Make words by lining up letters from left-to-right or top-to-bottom (like Scrabble).</li>
+            <li>Words must be in the text of Lord of the Rings to be valid.</li>
+            <li>Longer words are worth way more points.</li>
+            <li>Words that are ONLY in Lord of the Rings (i.e. are not ordinary English words) give 100 bonus points and clear the board.</li>
+        </ul>
+    </div>
     {/if}
+
+    <h1 class="text-center text-5xl font-serif pt-4 text-blue-200 w-2/4 m-auto tracking-widest">ENT-RIS</h1>
+    <h3 class="text-center text-xl text-blue-300 mb-2">A Middle-Earth word-building game</h3>
+    
+    <!-- button row -->
+    <div class="w-full grid grid-cols-3 text-center">
+        <div class="flex items-center text-left pl-4 text-blue-200 text-2xl">Score: {score}</div>
+        {#if !gameOn}
+        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Start</button>
+        {:else}
+        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Pause</button>
+        {/if}
+        <button on:click={() => showMenu = !showMenu} class="inline-block text-right text-4xl px-2 text-black bg-blue-300 mx-auto mr-4 border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">
+            Rules
+        </button>
+    </div>
     <div id="gameBoxContainer" class="relative inline-flex top-[10px] max-w-[800px] w-screen aspect-square max-h-[600px] text-6xl">
-        <div id="nextBox" class="opacity-0 relative ml-4 justify-between bg-slate-900 w-[8%] h-full text-6xl py-4 outline outline-4 outline-slate-300">
+        <div id="pastWords" class="overflow-hidden flex flex-col-reverse flex-grow mx-4 relative justify-start bg-slate-900 w-[9%] h-full text-xs sm:text-base tracking-tighter text-slate-300 py-4 outline outline-2 outline-slate-300">
+            <!-- <div class="">wordword</div>
+            <div class="">word2</div> -->
         </div>
-        <div id="gameBox" class="relative bg-slate-900 w-[81%] max-w-[540px] mx-auto h-full text-4xl md:text-6xl outline outline-4 outline-slate-300">
+        <div id="gameBox" class="relative bg-slate-900 w-[71%] max-w-[540px] mx-auto h-full text-4xl md:text-6xl outline outline-4 outline-slate-300">
             
         </div>
-        <div id="nextBox" class="relative flex flex-col justify-between bg-slate-900 w-[8%] h-full mx-4 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-4 outline-slate-300">
-
-            <div id="next1" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
-            <div id="next2" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
-            <div id="next3" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
-            <div id="next4" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
-            <div id="next5" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
-            <div id="next6" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
-
+        <div id="nextBox" class="relative flex flex-grow flex-col justify-between bg-slate-900 w-[9%] h-full mx-4 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-2 outline-slate-300">
+            <div id="next1" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
+            <div id="next2" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
+            <div id="next3" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
+            <div id="next4" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
+            <div id="next5" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
+            <div id="next6" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
         </div>
     </div>
     {#if gameOver}
