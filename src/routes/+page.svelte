@@ -3,6 +3,7 @@
     // import words from 'an-array-of-english-words';
 
     import lordWords from '$lib/lordWords.json';
+    import lordOnlyWords from '$lib/lordOnlyWords.json'
   import { fly } from "svelte/transition";
 
 
@@ -343,7 +344,17 @@
 
     function updateScore(wordList: string[]) {
         for (let word of wordList) {
-            score += word.length;
+            if (word.length === 3) {
+                score += 3;
+            } else if (word.length === 4) {
+                score += 8;
+            } else if (word.length === 5) {
+                score += 18;
+            } else if (word.length === 6) {
+                score += 38;
+            } else if (word.length > 6) {
+                score += 68;
+            }
         }
     }
 
@@ -388,6 +399,10 @@
                 if (gameGrid[startRow][i] === '.') break;
                 currentWord += gameGrid[startRow][i];
                 if (i < startCol) continue;
+                if (currentWord.length > 2 && lordOnlyWords.includes(currentWord.toLowerCase())) {
+                    score += 100;
+                    // clearBoard();
+                } 
                 if (currentWord.length > 2 && lordWords.includes(currentWord.toLowerCase())) {
                     console.log('found a valid Word!', currentWord);
                     foundWords[currentWord] = [];
@@ -519,14 +534,15 @@
 </script>
 <body class="overflow-hidden relative w-screen max-w-[800px] mx-auto h-full min-h-screen bg-green-950 bg-opacity-60">
     {#if showMenu}
-    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[400px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
-        <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-black hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
+    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden max-w-screen w-[500px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
+        <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
         <ul class="text-xl list-disc list-inside ml-4 mt-4 text-blue-200">
             <li>Make words by lining up letters from left-to-right or top-to-bottom (like Scrabble).</li>
-            <li>Words must be in the text of Lord of the Rings to be valid.</li>
+            <li>Words must be in the text of Lord of the Rings to be valid. This includes dialogue and the removal of accents or punctuation.</li>
             <li>Longer words are worth way more points.</li>
-            <li>Words that are ONLY in Lord of the Rings (i.e. are not ordinary English words) give 100 bonus points and clear the board.</li>
+            <li>Words that are ONLY in Lord of the Rings (i.e. are not English words), such as FRODO, give 100 bonus points and clear the board.</li>
         </ul>
+        <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">--></button>
     </div>
     {/if}
 
