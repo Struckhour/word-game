@@ -1,35 +1,32 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
     // import words from 'an-array-of-english-words';
-    import { fellowText } from "$lib/fellowText";
-    import { towerText } from "$lib/towers";
-    import { returnText } from "$lib/returnText";
 
-    const towerWords = towerText.split(' ');
-    const fellowWords = fellowText.split(' ');
-    const returnWords = returnText.split(' ');
-    let uniqueWords: string[] = [];
-    for (let word of fellowWords) {
-        if (uniqueWords.includes(word.toLowerCase())) {
-            continue;
-        } else {
-            uniqueWords.push(word.toLowerCase());
-        }
-    }
-    for (let word of towerWords) {
-        if (uniqueWords.includes(word.toLowerCase())) {
-            continue;
-        } else {
-            uniqueWords.push(word.toLowerCase());
-        }
-    };
-    for (let word of returnWords) {
-        if (uniqueWords.includes(word.toLowerCase())) {
-            continue;
-        } else {
-            uniqueWords.push(word.toLowerCase());
-        }
-    };
+    import lordWords from '$lib/lordWords.json';
+
+
+    // let uniqueWords: string[] = [];
+    // for (let word of fellowWords) {
+    //     if (uniqueWords.includes(word.toLowerCase())) {
+    //         continue;
+    //     } else {
+    //         uniqueWords.push(word.toLowerCase());
+    //     }
+    // }
+    // for (let word of towerWords) {
+    //     if (uniqueWords.includes(word.toLowerCase())) {
+    //         continue;
+    //     } else {
+    //         uniqueWords.push(word.toLowerCase());
+    //     }
+    // };
+    // for (let word of returnWords) {
+    //     if (uniqueWords.includes(word.toLowerCase())) {
+    //         continue;
+    //     } else {
+    //         uniqueWords.push(word.toLowerCase());
+    //     }
+    // };
 
 
     // function getLetterCounts() {
@@ -378,7 +375,7 @@
                 if (gameGrid[startRow][i] === '.') break;
                 currentWord += gameGrid[startRow][i];
                 if (i < startCol) continue;
-                if (currentWord.length > 2 && uniqueWords.includes(currentWord.toLowerCase())) {
+                if (currentWord.length > 2 && lordWords.includes(currentWord.toLowerCase())) {
                     console.log('found a valid Word!', currentWord);
                     foundWords[currentWord] = [];
                     for (let j = s; j <= i; j++) {
@@ -395,7 +392,7 @@
                 if (gameGrid[i][startCol] === '.') break;
                 currentWord += gameGrid[i][startCol];
                 if (i < startRow) continue;
-                if (currentWord.length > 2 && uniqueWords.includes(currentWord.toLowerCase())) {
+                if (currentWord.length > 2 && lordWords.includes(currentWord.toLowerCase())) {
                     console.log('found a valid Word!', currentWord);
                     foundWords[currentWord] = [];
                     for (let j = s; j <= i; j++) {
