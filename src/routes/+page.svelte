@@ -624,7 +624,7 @@
             <!-- <div class="">wordword</div>
             <div class="">word2</div> -->
         </div>
-        <div id="gameBox" class="relative bg-slate-900 w-[71%] max-w-[540px] mx-auto h-full text-4xl md:text-6xl outline outline-4 outline-slate-300">
+        <div id="gameBox" class="relative bg-slate-900 w-[71%] max-w-[540px] mx-auto h-full text-2xl md:text-4xl lg:text-6xl outline outline-4 outline-slate-300">
             
         </div>
         <div id="nextBox" class="relative flex flex-grow flex-col justify-between bg-slate-900 w-[9%] h-full mx-4 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-2 outline-slate-300">
@@ -647,7 +647,7 @@
     {#if gameOver && score < 200}
     <div class="absolute top-[300px] left-2/4 -translate-x-2/4 border border-black bg-red-500 text-black text-4xl px-4">Game Over</div>
     {:else if gameOver && score >=200}
-    <div class="absolute top-2/4 -translate-y-2/4 left-2/4 p-2 -translate-x-2/4 border border-black bg-yellow-500 text-black text-lg px-4">
+    <div class="absolute top-2/4 -translate-y-2/4 left-2/4 p-2 -translate-x-2/4 border border-black bg-yellow-500 text-black text-lg">
         <h2 class="text-xl text-center font-bold">Suspicious Activity Detected</h2>
         Our system has detected possible cheating. A company representative has been dispatched to the IP affiliated with this account: [North Okanagan Youth and Family Services]. If, after thorough inspection, Agent B. Childress confirms your full compliance, no further action will be required. Otherwise you will be rigorousl>>></div>
     {/if}
