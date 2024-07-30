@@ -120,7 +120,10 @@
 
 
     function buildNextLetters() {
-        for (let i = 0; i < 6; i++) {
+        for (let wordDiv of foundWordDivs) {
+            wordDiv.remove();
+        }
+        for (let i = 0; i < 8; i++) {
             const randomLetter = getRandomLetter();
             nextLetters.push(randomLetter);
         }
@@ -128,7 +131,7 @@
 
     function updateNextLetters() {
         let newNextLetters = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 7; i++) {
             newNextLetters.push(nextLetters[i + 1])
         }
         const randomLetter = getRandomLetter();
@@ -137,7 +140,7 @@
     }
 
     function updateNextDivs() {
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 8; i++) {
             const thisDiv = document.getElementById(`next${i + 1}`);
             if (thisDiv) {
                 thisDiv.textContent = nextLetters[i];
@@ -159,6 +162,15 @@
         columnDepths.push(colCount);
         }
     }
+
+    function deleteBoardDivs() {
+        for (let divRow of letterDivGrid) {
+            for (let letterDiv of divRow) {
+                if (letterDiv) letterDiv.remove();
+            }
+        }
+    }
+
 
     function buildGameGrid() {
         gameGrid = [];
@@ -242,6 +254,30 @@
         }
     };
 
+    function leftClick() {
+        if(activePosition[0] > 0 && (activePosition[1] < (columnDepths[currentColumn -1] -1) * letterHeight)  ) {
+            activePosition[0] -= step;
+            activeLetter.style.left = `${activePosition[0]}%`;
+            currentColumn -= 1;
+        }
+    }
+
+    function downClick() {
+        if(activePosition[1]< (columnDepths[currentColumn] -1) * letterHeight) {
+            activePosition[1] = (columnDepths[currentColumn] -1) * letterHeight;
+            activeLetter.style.top = `${activePosition[1]}%`;
+                        // columnDepths[currentColumn] -= 1;
+        }
+    }
+
+    function rightClick() {
+        if (activePosition[0]< (cols-1) * letterWidth && (activePosition[1] < (columnDepths[currentColumn + 1] -1) * letterHeight)) {
+            activePosition[0] += step;
+            activeLetter.style.left = `${activePosition[0]}%`;
+            currentColumn += 1;
+        }
+    }
+
     onMount(() => {
         window.addEventListener("keydown", handleKeyDown);
         
@@ -253,6 +289,14 @@
     onDestroy(() => {
         clearInterval(gameInterval);
     })
+
+    function pauseGame() {
+        if (gameOn && !gameOver) {
+            gameOn = false;
+            clearInterval(gameInterval);
+            return;
+        }
+    }
 
     function startGame() {
         if (gameOn && !gameOver) {
@@ -293,7 +337,11 @@
         return true;
     }
 
-
+    function setGameSpeed() {
+        if (score > 100) {
+            gameSpeed = score / 10;
+        }
+    }
 
     function resetGame() {
         console.log(letterProbs());
@@ -305,10 +353,10 @@
                 clearInterval(gameInterval);
             }
             // check if enough time has passed since last interval, based on game speed.
-            if (Date.now() > lastMove + gameSpeed) {
+            if (Date.now() > lastMove + 10) {
                 // check if the current letter is at the bottom of a column
                 if (activePosition[1] < (columnDepths[currentColumn] -1) * letterHeight) {
-                    activePosition[1] += .2;
+                    activePosition[1] += .2 * gameSpeed / 10;
                     activeLetter.style.top = `${activePosition[1]}%`;
                     lastMove = Date.now();
                 } else {
@@ -316,15 +364,19 @@
                     const activeRow = Math.round(activePosition[1] / letterHeight);
                     const activeCol = Math.round(activePosition[0] / letterWidth);
                     const copiedLetterDiv = activeLetter.cloneNode(true) as HTMLDivElement;
+                    copiedLetterDiv.style.top = `${activeRow * letterHeight}%`;
                     letterDivGrid[activeRow][activeCol] = copiedLetterDiv;
                     const gameBox = document.getElementById('gameBox');
                     if (gameBox) gameBox.appendChild(copiedLetterDiv);
                     activeLetter.remove();
                     gameGrid[columnDepths[currentColumn] - 1][currentColumn] = activeLetterText;
+
+                    // check for words
                     const foundNewWords = findAllNewWords(columnDepths[currentColumn] - 1, currentColumn);
                     columnDepths[currentColumn] -= 1;
                     const redLetters = colorWordLetters(foundNewWords);
                     if (redLetters.length > 0) {
+                        setGameSpeed();
                         addWordDivs(Object.keys(foundNewWords));
                         allFoundWords = allFoundWords.concat(Object.keys(foundNewWords));
                         updateScore(Object.keys(foundNewWords));
@@ -401,7 +453,9 @@
                 if (i < startCol) continue;
                 if (currentWord.length > 2 && lordOnlyWords.includes(currentWord.toLowerCase())) {
                     score += 100;
-                    // clearBoard();
+                    deleteBoardDivs();
+                    buildGameGrid();
+                    buildDivGrid();
                 } 
                 if (currentWord.length > 2 && lordWords.includes(currentWord.toLowerCase())) {
                     console.log('found a valid Word!', currentWord);
@@ -546,18 +600,22 @@
     </div>
     {/if}
 
-    <h1 class="text-center text-5xl font-serif pt-4 text-blue-200 w-2/4 m-auto tracking-widest">ENT-RIS</h1>
-    <h3 class="text-center text-xl text-blue-300 mb-2">A Middle-Earth word-building game</h3>
+    <h1 class="ml-4 md:mx-auto inline md:block text-center text-xl md:text-5xl font-serif pt-4 text-blue-200 w-2/4 m-auto tracking-widest">ENT-RIS</h1>
+    <h3 class="inline md:block text-center text-sm md:text-xl text-blue-300 mb-2">A Middle-Earth word-building game</h3>
     
-    <!-- button row -->
+    <!--menu button row -->
     <div class="w-full grid grid-cols-3 text-center">
         <div class="flex items-center text-left pl-4 text-blue-200 text-2xl">Score: {score}</div>
-        {#if !gameOn}
+        {#if !gameOn && fresh && !gameOver}
         <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Start</button>
+        {:else if !gameOn && !fresh && !gameOver}
+        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Resume</button>
+        {:else if !gameOn && !fresh && gameOver}
+        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Restart</button>
         {:else}
         <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Pause</button>
         {/if}
-        <button on:click={() => showMenu = !showMenu} class="inline-block text-right text-4xl px-2 text-black bg-blue-300 mx-auto mr-4 border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">
+        <button on:click={() => {showMenu = !showMenu; pauseGame()}} class="inline-block text-right text-4xl px-2 text-black bg-blue-300 mx-auto mr-4 border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">
             Rules
         </button>
     </div>
@@ -576,9 +634,21 @@
             <div id="next4" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
             <div id="next5" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
             <div id="next6" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+            <div id="next7" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+            <div id="next8" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
         </div>
     </div>
-    {#if gameOver}
+    <!-- left right down buttons -->
+    <div class="mt-4 grid grid-cols-3 grid-rows-1 w-[71%] gap-x-4 max-w-[540px] h-[50px] mx-auto xl:hidden">
+        <button on:click={leftClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">left</button>
+        <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">v</button>
+        <button on:click={rightClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">right</button>
+    </div>
+    {#if gameOver && score < 200}
     <div class="absolute top-[300px] left-2/4 -translate-x-2/4 border border-black bg-red-500 text-black text-4xl px-4">Game Over</div>
+    {:else if gameOver && score >=200}
+    <div class="absolute top-2/4 -translate-y-2/4 left-2/4 p-2 -translate-x-2/4 border border-black bg-yellow-500 text-black text-lg px-4">
+        <h2 class="text-xl text-center font-bold">Suspicious Activity Detected</h2>
+        Our system has detected possible cheating. A company representative has been dispatched to the IP affiliated with this account: [North Okanagan Youth and Family Services]. If, after thorough inspection, Agent B. Childress confirms your full compliance, no further action will be required. Otherwise you will be rigorousl>>></div>
     {/if}
 </body>
