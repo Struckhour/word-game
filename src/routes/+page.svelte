@@ -2,9 +2,12 @@
     import { onDestroy, onMount } from "svelte";
     // import words from 'an-array-of-english-words';
     import { fellowText } from "$lib/fellowText";
+    import { towerText } from "$lib/towers";
+    import { returnText } from "$lib/returnText";
 
-
+    const towerWords = towerText.split(' ');
     const fellowWords = fellowText.split(' ');
+    const returnWords = returnText.split(' ');
     let uniqueWords: string[] = [];
     for (let word of fellowWords) {
         if (uniqueWords.includes(word.toLowerCase())) {
@@ -13,6 +16,21 @@
             uniqueWords.push(word.toLowerCase());
         }
     }
+    for (let word of towerWords) {
+        if (uniqueWords.includes(word.toLowerCase())) {
+            continue;
+        } else {
+            uniqueWords.push(word.toLowerCase());
+        }
+    };
+    for (let word of returnWords) {
+        if (uniqueWords.includes(word.toLowerCase())) {
+            continue;
+        } else {
+            uniqueWords.push(word.toLowerCase());
+        }
+    };
+
 
     // function getLetterCounts() {
     //     let letters = []
@@ -40,8 +58,8 @@
 
 
     const shortLetterCounts: Record<string, number> = {
-        a:8387, b: 2317,c: 2657,d: 3388,e: 8980,f: 1677,g: 2381,h: 2481,i: 5196,j: 458,k: 2225,l: 4563
-        ,m: 2817,n: 4037,o: 6418,p: 2887,q: 136,r: 5436,s: 8604,t: 4551,u: 3595,v: 954,w: 1606,x: 412,y: 2780,z: 628
+        a:8387*2, b: 2317,c: 2657,d: 3388,e: 8980*2,f: 1677,g: 2381,h: 2481,i: 5196*2,j: 458,k: 2225,l: 4563
+        ,m: 2817,n: 4037,o: 6418*2,p: 2887,q: 136,r: 5436,s: 8604,t: 4551,u: 3595*2,v: 954,w: 1606,x: 412,y: 2780,z: 628
     }
 
     function sumArray(numbers: number[]): number {
@@ -78,12 +96,13 @@
     let fresh = true;
     let x = 0;
     let y = 0;
-    const step = 60;
-    const letterSize = 60;
+    const step = 11.11;
+    const letterWidth = 11.11;
+    const letterHeight = 10;
     const gameWidth = 540;
     const gameHeight = 600;
-    const rows = (gameHeight / letterSize);
-    const cols = (gameWidth / letterSize);
+    const rows = 10;
+    const cols = 9;
     let activePosition: number[] = [];
     let activeLetterText = '';
     let lastMove = 0;
@@ -96,6 +115,7 @@
     let letterDivGrid: (HTMLDivElement | null)[][] = [];
     let activeLetter: HTMLDivElement;
     let nextLetters: string[] = [];
+    let gameOver = false;
 
     function buildNextLetters() {
         for (let i = 0; i < 6; i++) {
@@ -169,7 +189,7 @@
 // Function to handle div creation
     const createActiveLetter = () => {
         
-        activePosition = [4 * letterSize, 0];
+        activePosition = [4 * letterWidth, 0];
         currentColumn = 4;
         const gameBox = document.getElementById('gameBox');
         activeLetter = document.createElement('div');
@@ -177,12 +197,15 @@
         activeLetter.textContent = activeLetterText;
         activeLetter.style.position = 'absolute';
         activeLetter.style.backgroundColor = '#fef9c3';
-        activeLetter.style.width = `${letterSize}px`;
-        activeLetter.style.height = `${letterSize}px`;
-        activeLetter.style.top = `${activePosition[1]}px`;
-        activeLetter.style.left = `${activePosition[0]}px`;
+        activeLetter.style.width = `${letterWidth}%`;
+        activeLetter.style.height = `${letterHeight}%`;
+        activeLetter.style.top = `${activePosition[1]}%`;
+        activeLetter.style.left = `${activePosition[0]}%`;
         activeLetter.style.border = 'black 1px solid';
         activeLetter.style.textAlign = 'center';
+        activeLetter.style.display = 'flex';
+        activeLetter.style.alignItems = 'center';
+        activeLetter.style.justifyContent = 'center';
         if (gameBox) gameBox.appendChild(activeLetter);
     };
 
@@ -193,23 +216,23 @@
                 case "ArrowUp":
                     break;
                 case "ArrowDown":
-                    if(activePosition[1]< (columnDepths[currentColumn] -1) * letterSize) {
-                        activePosition[1] = (columnDepths[currentColumn] -1) * letterSize;
-                        activeLetter.style.top = `${activePosition[1]}px`;
+                    if(activePosition[1]< (columnDepths[currentColumn] -1) * letterHeight) {
+                        activePosition[1] = (columnDepths[currentColumn] -1) * letterHeight;
+                        activeLetter.style.top = `${activePosition[1]}%`;
                         // columnDepths[currentColumn] -= 1;
                     }
                     break;
                 case "ArrowLeft":
-                    if(activePosition[0] > 0) {
+                    if(activePosition[0] > 0 && (activePosition[1] < (columnDepths[currentColumn -1] -1) * letterHeight)  ) {
                         activePosition[0] -= step;
-                        activeLetter.style.left = `${activePosition[0]}px`;
+                        activeLetter.style.left = `${activePosition[0]}%`;
                         currentColumn -= 1;
                     }
                     break;
                 case "ArrowRight":
-                    if (activePosition[0]< gameWidth - letterSize) {
+                    if (activePosition[0]< (cols-1) * letterWidth && (activePosition[1] < (columnDepths[currentColumn + 1] -1) * letterHeight)) {
                         activePosition[0] += step;
-                        activeLetter.style.left = `${activePosition[0]}px`;
+                        activeLetter.style.left = `${activePosition[0]}%`;
                         currentColumn += 1;
                     }
                     break;
@@ -230,9 +253,20 @@
     })
 
     function startGame() {
+        if (gameOn && !gameOver) {
+            gameOn = false;
+            clearInterval(gameInterval);
+            return;
+        }
+        if (!gameOn && !gameOver && !fresh) {
+            gameOn = true;
+            resetGame();
+            return;
+        }
         // getLetterCounts();
         gameOn = true;
         fresh = false;
+        gameOver = false;
         buildNextLetters();
         updateNextLetters();
         console.log('about to update divs: ', nextLetters);
@@ -265,19 +299,20 @@
         gameInterval = setInterval(() => {
             if (!checkColumnDepths()) {
                 gameOn = false;
+                gameOver = true;
                 clearInterval(gameInterval);
             }
             // check if enough time has passed since last interval, based on game speed.
             if (Date.now() > lastMove + gameSpeed) {
                 // check if the current letter is at the bottom of a column
-                if (activePosition[1] < (columnDepths[currentColumn] -1) * letterSize) {
-                    activePosition[1] += 1;
-                    activeLetter.style.top = `${activePosition[1]}px`;
+                if (activePosition[1] < (columnDepths[currentColumn] -1) * letterHeight) {
+                    activePosition[1] += .2;
+                    activeLetter.style.top = `${activePosition[1]}%`;
                     lastMove = Date.now();
                 } else {
                     // add to the gamegrid and switch to a new letter
-                    const activeRow = Math.round(activePosition[1] / letterSize);
-                    const activeCol = Math.round(activePosition[0] / letterSize);
+                    const activeRow = Math.round(activePosition[1] / letterHeight);
+                    const activeCol = Math.round(activePosition[0] / letterWidth);
                     const copiedLetterDiv = activeLetter.cloneNode(true) as HTMLDivElement;
                     letterDivGrid[activeRow][activeCol] = copiedLetterDiv;
                     const gameBox = document.getElementById('gameBox');
@@ -422,13 +457,13 @@
                         droppedGrid[r][c] = '.';
 
                         // update the actual divGrid
-                        const newTopLocation = r * letterSize + dropGrid[r][c] * letterSize;
+                        const newTopLocation = r * letterHeight + dropGrid[r][c] * letterHeight;
                         const thisDiv = letterDivGrid[r][c];
                         if (thisDiv) {
                             const deepCopiedDiv = thisDiv.cloneNode(true) as HTMLDivElement;
                             const gameBox = document.getElementById('gameBox');
                             if (gameBox) gameBox.appendChild(deepCopiedDiv);
-                            deepCopiedDiv.style.top = `${newTopLocation}px`;
+                            deepCopiedDiv.style.top = `${newTopLocation}%`;
                             letterDivGrid[r + drops][c] = deepCopiedDiv;
                             thisDiv.remove();
                             letterDivGrid[r][c] = null;
@@ -460,26 +495,30 @@
 </script>
 <body class="w-screen max-w-[800px] mx-auto h-screen max-h-screen bg-green-950 bg-opacity-60">
 
-    <h1 class="text-center text-4xl pt-8 text-blue-200 w-2/4 m-auto">Letter Game</h1>
+    <h1 class="text-center text-4xl pt-4 text-blue-200 w-2/4 m-auto">Entris</h1>
+    {#if !gameOn}
     <button on:click={startGame} class="block text-center text-4xl px-2 text-black bg-blue-200 mx-auto border border-black rounded-lg hover:bg-blue-300 active:bg-blue-400">Start</button>
-    <div id="gameBoxContainer" class="relative inline-flex top-[10px] max-w-[800px] w-full h-[600px] text-6xl">
-        <div id="nextBox" class="relative ml-4 flex flex-col justify-between bg-slate-900 w-[80px] h-[600px] text-6xl py-4 outline outline-4 outline-slate-300">
+    {:else}
+    <button on:click={startGame} class="block text-center text-4xl px-2 text-black bg-blue-200 mx-auto border border-black rounded-lg hover:bg-blue-300 active:bg-blue-400">Pause</button>
+    {/if}
+    <div id="gameBoxContainer" class="relative inline-flex top-[10px] max-w-[800px] w-screen aspect-square max-h-[600px] text-6xl">
+        <div id="nextBox" class="opacity-0 relative ml-4 justify-between bg-slate-900 w-[8%] h-full text-6xl py-4 outline outline-4 outline-slate-300">
         </div>
-        <div id="gameBox" class="relative bg-slate-900 min-w-[540px] max-w-[540px] mx-auto w-full h-[600px] text-6xl outline outline-4 outline-slate-300">
+        <div id="gameBox" class="relative bg-slate-900 w-[81%] max-w-[540px] mx-auto h-full text-4xl md:text-6xl outline outline-4 outline-slate-300">
             
         </div>
-        <div id="nextBox" class="relative flex flex-col justify-between bg-slate-900 w-[80px] h-[600px] mr-4 text-6xl py-4 outline outline-4 outline-slate-300">
+        <div id="nextBox" class="relative flex flex-col justify-between bg-slate-900 w-[8%] h-full mx-4 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-4 outline-slate-300">
 
-            <div id="next1" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-80 mx-auto text-center"></div>
-            <div id="next2" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-70 mx-auto text-center"></div>
-            <div id="next3" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-60 mx-auto text-center"></div>
-            <div id="next4" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-50 mx-auto text-center"></div>
-            <div id="next5" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-40 mx-auto text-center"></div>
-            <div id="next6" class= "w-[60px] h-[60px] bg-yellow-100 bg-opacity-30 mx-auto text-center"></div>
+            <div id="next1" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
+            <div id="next2" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
+            <div id="next3" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
+            <div id="next4" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
+            <div id="next5" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
+            <div id="next6" class= "flex items-center justify-center w-[80%] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
 
         </div>
     </div>
-    {#if !gameOn && !fresh}
+    {#if gameOver}
     <div class="absolute top-[300px] left-2/4 -translate-x-2/4 border border-black bg-red-500 text-black text-4xl px-4">Game Over</div>
     {/if}
 </body>
