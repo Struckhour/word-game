@@ -586,9 +586,9 @@
         updateColumnDepths();
     }
 </script>
-<body class="overflow-hidden relative w-screen max-w-[800px] mx-auto h-full min-h-screen bg-green-950 bg-opacity-60">
+<body class="square relative mx-auto min-h-screen bg-green-950 bg-opacity-60">
     {#if showMenu}
-    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden max-w-screen w-[500px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
+    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden max-w-screen-sm w-[500px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
         <ul class="text-xl list-disc list-inside ml-4 mt-4 text-blue-200">
             <li>Make words by lining up letters from left-to-right or top-to-bottom (like Scrabble).</li>
@@ -600,11 +600,11 @@
     </div>
     {/if}
 
-    <h1 class="ml-4 md:mx-auto inline md:block text-center text-xl md:text-5xl font-serif pt-4 text-blue-200 w-2/4 m-auto tracking-widest">ENT-RIS</h1>
-    <h3 class="inline md:block text-center text-sm md:text-xl text-blue-300 mb-2">A Middle-Earth word-building game</h3>
+    <!-- <h1 class="ml-4 lg:mx-auto inline lg:block text-center text-xl lg:text-5xl font-serif pt-4 text-blue-200 w-2/4 m-auto tracking-widest">ENT-RIS</h1>
+    <h3 class="inline lg:block text-center text-sm lg:text-xl text-blue-300 mb-2">A Middle-Earth word-building game</h3> -->
     
     <!--menu button row -->
-    <div class="w-full grid grid-cols-3 text-center">
+    <div class="w-full grid grid-cols-3 text-center h-[10%] py-4">
         <div class="flex items-center text-left pl-4 text-blue-200 text-2xl">Score: {score}</div>
         {#if !gameOn && fresh && !gameOver}
         <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Start</button>
@@ -619,7 +619,7 @@
             Rules
         </button>
     </div>
-    <div id="gameBoxContainer" class="relative inline-flex top-[10px] max-w-[800px] w-screen aspect-square max-h-[600px] text-6xl">
+    <div id="gameBoxContainer" class="relative inline-flex top-[10px] aspect-square h-[75%] text-6xl border border-slate-100 left-2/4 -translate-x-2/4">
         <div id="pastWords" class="overflow-hidden flex flex-col-reverse flex-grow mx-4 relative justify-start bg-slate-900 w-[9%] h-full text-xs sm:text-base tracking-tighter text-slate-300 py-4 outline outline-2 outline-slate-300">
             <!-- <div class="">wordword</div>
             <div class="">word2</div> -->
@@ -639,9 +639,9 @@
         </div>
     </div>
     <!-- left right down buttons -->
-    <div class="mt-4 grid grid-cols-3 grid-rows-1 w-[71%] gap-x-4 max-w-[540px] h-[50px] mx-auto xl:hidden">
+    <div class="grid grid-cols-3 grid-rows-1 w-[71%] gap-x-4 max-w-[540px] mx-auto xl:hidden h-[10%] py-4">
         <button on:click={leftClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">left</button>
-        <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">v</button>
+        <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">down</button>
         <button on:click={rightClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">right</button>
     </div>
     {#if gameOver && score < 200}
@@ -656,5 +656,16 @@
 <style>
     html, body {
       touch-action: manipulation;
+    }
+    .square {
+      width: 100vw;
+      height: 100vw;
+    }
+
+    @media (min-width: 800px) {
+      .square {
+        width: 100vh;
+        height: 100vh;
+      }
     }
 </style>
