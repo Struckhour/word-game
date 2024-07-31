@@ -591,6 +591,7 @@
     <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[400px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
         <ul class="text-xl list-disc list-inside ml-4 mt-4 text-blue-200">
+            <li>Use arrow keys or buttons below game board.</li>
             <li>Make words by lining up letters from left-to-right or top-to-bottom (like Scrabble).</li>
             <li>Words must be in the text of Lord of the Rings to be valid. This includes dialogue and the removal of accents or punctuation.</li>
             <li>Longer words are worth way more points.</li>
@@ -621,7 +622,7 @@
             Rules
         </button>
     </div>
-    <div id="gameBoxContainer" class="relative inline-flex max-w-[600px] w-full h-[75%] text-6xl left-2/4 -translate-x-2/4">
+    <div id="gameBoxContainer" class="relative inline-flex max-w-[800px] w-full h-[75%] text-6xl left-2/4 -translate-x-2/4">
         <div id="pastWords" class="overflow-hidden flex flex-col-reverse flex-grow mx-2 relative justify-start bg-slate-900 w-[9%] h-full text-xs sm:text-base tracking-tighter text-slate-300 py-4 outline outline-2 outline-slate-300">
             <!-- <div class="">wordword</div>
             <div class="">word2</div> -->
@@ -666,7 +667,7 @@
 
     @media (min-width: 800px) {
       .square {
-        max-width: 600px;
+        max-width: 800px;
         width: 100vw;
         height: 100vh;
       }
