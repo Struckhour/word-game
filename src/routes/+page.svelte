@@ -586,7 +586,7 @@
         updateColumnDepths();
     }
 </script>
-<body class="square relative mx-auto min-h-screen bg-green-950 bg-opacity-60">
+<body class="overflow-hidden square relative mx-auto min-h-screen bg-green-950 bg-opacity-60">
     {#if showMenu}
     <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[400px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
