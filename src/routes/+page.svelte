@@ -588,7 +588,7 @@
 </script>
 <body class="square relative mx-auto min-h-screen bg-green-950 bg-opacity-60">
     {#if showMenu}
-    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden max-w-screen-sm w-[500px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
+    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[400px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
         <ul class="text-xl list-disc list-inside ml-4 mt-4 text-blue-200">
             <li>Make words by lining up letters from left-to-right or top-to-bottom (like Scrabble).</li>
@@ -600,11 +600,13 @@
     </div>
     {/if}
 
-    <!-- <h1 class="ml-4 lg:mx-auto inline lg:block text-center text-xl lg:text-5xl font-serif pt-4 text-blue-200 w-2/4 m-auto tracking-widest">ENT-RIS</h1>
-    <h3 class="inline lg:block text-center text-sm lg:text-xl text-blue-300 mb-2">A Middle-Earth word-building game</h3> -->
+    <div class="relative h-[5%] border border-black flex items-center justify-start text-left">
+        <h1 class="ml-4 text-center text-xl font-serif text-blue-200 tracking-widest">ENT-RIS</h1>
+        <h3 class="ml-4 text-center text-sm text-blue-300">A Middle-Earth word-building game</h3>
+    </div>
     
     <!--menu button row -->
-    <div class="w-full grid grid-cols-3 text-center h-[10%] py-4">
+    <div class="w-[71%] mx-auto grid grid-cols-3 text-center h-[8%] py-[1%]">
         <div class="flex items-center text-left pl-4 text-blue-200 text-2xl">Score: {score}</div>
         {#if !gameOn && fresh && !gameOver}
         <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Start</button>
@@ -619,23 +621,23 @@
             Rules
         </button>
     </div>
-    <div id="gameBoxContainer" class="relative inline-flex top-[10px] aspect-square h-[75%] text-6xl border border-slate-100 left-2/4 -translate-x-2/4">
-        <div id="pastWords" class="overflow-hidden flex flex-col-reverse flex-grow mx-4 relative justify-start bg-slate-900 w-[9%] h-full text-xs sm:text-base tracking-tighter text-slate-300 py-4 outline outline-2 outline-slate-300">
+    <div id="gameBoxContainer" class="relative inline-flex max-w-[600px] w-full h-[75%] text-6xl left-2/4 -translate-x-2/4">
+        <div id="pastWords" class="overflow-hidden flex flex-col-reverse flex-grow mx-2 relative justify-start bg-slate-900 w-[9%] h-full text-xs sm:text-base tracking-tighter text-slate-300 py-4 outline outline-2 outline-slate-300">
             <!-- <div class="">wordword</div>
             <div class="">word2</div> -->
         </div>
-        <div id="gameBox" class="relative bg-slate-900 w-[71%] max-w-[540px] mx-auto h-full text-2xl md:text-4xl lg:text-6xl outline outline-4 outline-slate-300">
+        <div id="gameBox" class="relative bg-slate-900 w-[71%] mx-auto h-full text-2xl md:text-4xl lg:text-6xl outline outline-2 outline-slate-300">
             
         </div>
-        <div id="nextBox" class="relative flex flex-grow flex-col justify-between bg-slate-900 w-[9%] h-full mx-4 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-2 outline-slate-300">
-            <div id="next1" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
-            <div id="next2" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
-            <div id="next3" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
-            <div id="next4" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
-            <div id="next5" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
-            <div id="next6" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
-            <div id="next7" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
-            <div id="next8" class= "flex items-center justify-center w-[80%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+        <div id="nextBox" class="relative flex flex-grow flex-col justify-between bg-slate-900 w-[9%] h-full mx-2 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-2 outline-slate-300">
+            <div id="next1" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
+            <div id="next2" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
+            <div id="next3" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
+            <div id="next4" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
+            <div id="next5" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
+            <div id="next6" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+            <div id="next7" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+            <div id="next8" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
         </div>
     </div>
     <!-- left right down buttons -->
@@ -659,12 +661,13 @@
     }
     .square {
       width: 100vw;
-      height: 100vw;
+      height: 100vh;
     }
 
     @media (min-width: 800px) {
       .square {
-        width: 100vh;
+        max-width: 600px;
+        width: 100vw;
         height: 100vh;
       }
     }
