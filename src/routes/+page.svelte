@@ -588,7 +588,7 @@
 </script>
 <body class="overflow-hidden square relative mx-auto min-h-screen bg-green-950 bg-opacity-60">
     {#if showMenu}
-    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[400px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
+    <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[350px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
         <ul class="text-xl list-disc list-inside ml-4 mt-4 text-blue-200">
             <li>Use arrow keys or buttons below game board.</li>
@@ -602,23 +602,23 @@
     {/if}
 
     <div class="relative h-[5%] border border-black flex items-center justify-start text-left">
-        <h1 class="ml-4 text-center text-xl font-serif text-blue-200 tracking-widest">ENT-RIS</h1>
-        <h3 class="ml-4 text-center text-sm text-blue-300">A Middle-Earth word-building game</h3>
+        <h1 class="ml-4 text-center text-xl font-serif text-blue-200 tracking-widest h-[80%] flex items-end">ENT-RIS</h1>
+        <h3 class="ml-4 text-center text-sm text-blue-300 h-[80%] flex items-end">A Middle-Earth word-building game</h3>
     </div>
     
     <!--menu button row -->
-    <div class="w-[71%] mx-auto grid grid-cols-3 text-center h-[8%] py-[1%]">
-        <div class="flex items-center text-left pl-4 text-blue-200 text-2xl">Score: {score}</div>
+    <div class="w-[91%] md:w-[71%] mx-auto grid grid-cols-3 text-center h-[8%] py-4 md:py-1">
+        <div class="flex items-center text-left pl-2 text-blue-200 text-xl md:text-2xl">Score: {score}</div>
         {#if !gameOn && fresh && !gameOver}
-        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Start</button>
+        <button on:click={startGame} class="inline-block text-center text-xl md:text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Start</button>
         {:else if !gameOn && !fresh && !gameOver}
-        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Resume</button>
+        <button on:click={startGame} class="inline-block text-center text-xl md:text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Resume</button>
         {:else if !gameOn && !fresh && gameOver}
-        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Restart</button>
+        <button on:click={startGame} class="inline-block text-center text-xl md:text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Restart</button>
         {:else}
-        <button on:click={startGame} class="inline-block text-center text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Pause</button>
+        <button on:click={startGame} class="inline-block text-center text-xl md:text-4xl px-2 text-black bg-blue-300 mx-auto border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">Pause</button>
         {/if}
-        <button on:click={() => {showMenu = !showMenu; pauseGame()}} class="inline-block text-right text-4xl px-2 text-black bg-blue-300 mx-auto mr-4 border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">
+        <button on:click={() => {showMenu = !showMenu; pauseGame()}} class="inline-block text-right text-xl md:text-4xl px-2 text-black bg-blue-300 mx-auto mr-2 border border-black rounded-lg hover:bg-blue-200 active:bg-blue-400">
             Rules
         </button>
     </div>
@@ -630,15 +630,15 @@
         <div id="gameBox" class="relative bg-slate-900 w-[71%] mx-auto h-full text-2xl md:text-4xl lg:text-6xl outline outline-2 outline-slate-300">
             
         </div>
-        <div id="nextBox" class="relative flex flex-grow flex-col justify-between bg-slate-900 w-[9%] h-full mx-2 text-2xl sm:text-4xl md:text-6xl  py-4 outline outline-2 outline-slate-300">
-            <div id="next1" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
-            <div id="next2" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
-            <div id="next3" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
-            <div id="next4" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
-            <div id="next5" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
-            <div id="next6" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
-            <div id="next7" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
-            <div id="next8" class= "flex items-center justify-center h-[10%] max-w-[60px] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+        <div id="nextBox" class="relative flex flex-grow flex-col justify-between bg-slate-900 w-[9%] h-full mx-2 text-2xl sm:text-4xl md:text-6xl py-2 outline outline-2 outline-slate-300">
+            <div id="next1" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-80 mx-auto"></div>
+            <div id="next2" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-70 mx-auto"></div>
+            <div id="next3" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-60 mx-auto"></div>
+            <div id="next4" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-50 mx-auto"></div>
+            <div id="next5" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-40 mx-auto"></div>
+            <div id="next6" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+            <div id="next7" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
+            <div id="next8" class= "flex items-center justify-center max-h-[10%] max-w-[100%] aspect-square bg-yellow-100 bg-opacity-30 mx-auto"></div>
         </div>
     </div>
     <!-- left right down buttons -->
