@@ -279,11 +279,31 @@
     }
 
     onMount(() => {
+
+        async function lockOrientation() {
+            try {
+                const screenOrientation = (screen.orientation) as any;
+                if (screenOrientation.lock) {
+                await screenOrientation.lock("portrait");
+                } else {
+                console.warn("Orientation lock API is not supported.");
+                }
+            } catch (err) {
+                console.error("Orientation lock failed:", err);
+            }
+        }
+
+        lockOrientation();
         window.addEventListener("keydown", handleKeyDown);
-        
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        } else if (window.screen && window.screen.orientation && window.screen.orientation.unlock) {
+            window.screen.orientation.unlock();
+        }
         };
+
     });
 
     onDestroy(() => {
@@ -586,7 +606,7 @@
         updateColumnDepths();
     }
 </script>
-<body class="overflow-hidden square relative mx-auto min-h-[95vh] bg-green-950 bg-opacity-60">
+<body class="overflow-hidden square relative mx-auto min-h-[90vh] bg-green-950 bg-opacity-60">
     {#if showMenu}
     <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[350px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
@@ -601,9 +621,9 @@
     </div>
     {/if}
 
-    <div class="relative h-[5%] border border-black flex items-center justify-start text-left">
-        <h1 class="ml-4 text-center text-xl font-serif text-blue-200 tracking-widest h-[80%] flex items-end">ENT-RIS</h1>
-        <h3 class="ml-4 text-center text-sm text-blue-300 h-[80%] flex items-end">A Middle-Earth word-building game</h3>
+    <div class="relative h-[5%] border-b border-black flex items-center justify-start text-left">
+        <h1 class="ml-4 text-center text-xl font-serif text-blue-200 tracking-widest h-full pb-1 flex items-end">ENT-RIS</h1>
+        <h3 class="ml-4 text-center text-sm text-blue-300 pb-1 flex items-end h-full">A Middle-Earth word-building game</h3>
     </div>
     
     <!--menu button row -->
@@ -662,7 +682,7 @@
     }
     .square {
       width: 100vw;
-      height: 95vh;
+      height: 90vh;
     }
 
     @media (min-width: 800px) {
@@ -672,4 +692,5 @@
         height: 95vh;
       }
     }
+
 </style>
