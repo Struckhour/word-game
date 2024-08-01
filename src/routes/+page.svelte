@@ -676,7 +676,7 @@
     {/if}
 </body>
 
-<div class="use-portrait absolute left-2/4 -translate-x-2/4 text-lg bg-black text-white">
+<div class="hidden use-portrait absolute left-2/4 -translate-x-2/4 top-2/4 -translate-y-2/4 text-lg text-white">
     Not enough room for content: Please rotate screen :)
 </div>
 
@@ -705,9 +705,14 @@
       }
 
     }
+    @media screen and (min-width: 800px) {
+        .square { display: block; }
+        .use-portrait { display: none; }
+    }
 
-    @media screen and (orientation: landscape) {
-   .square { display: none; }
-   .use-portrait { display: block; }
-}
+    @media screen and (max-width: 800px) and (orientation: landscape) {
+        .square { display: none; }
+        .use-portrait { display: block; }
+    }
+
 </style>
