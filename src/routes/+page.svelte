@@ -662,7 +662,7 @@
         </div>
     </div>
     <!-- left right down buttons -->
-    <div class="grid grid-cols-3 grid-rows-1 w-[71%] gap-x-4 max-w-[540px] mx-auto xl:hidden h-[10%] py-4">
+    <div class="grid grid-cols-3 grid-rows-1 w-[71%] gap-x-4 max-w-[540px] mx-auto xl:hidden h-[10%] py-2">
         <button on:click={leftClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8592</button>
         <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8595</button>
         <button on:click={rightClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8594</button>
