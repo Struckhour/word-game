@@ -667,13 +667,9 @@
         <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8595</button>
         <button on:click={rightClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8594</button>
     </div>
-    {#if gameOver && score < 200}
+
     <div class="absolute top-[300px] left-2/4 -translate-x-2/4 border border-black bg-red-500 text-black text-2xl px-2">Game Over</div>
-    {:else if gameOver && score >=200}
-    <div class="absolute top-2/4 -translate-y-2/4 left-2/4 p-2 -translate-x-2/4 border border-black bg-yellow-500 text-black text-lg">
-        <h2 class="text-xl text-center font-bold">Suspicious Activity Detected</h2>
-        Our system has detected possible cheating. A company representative has been dispatched to the IP affiliated with this account: [North Okanagan Youth and Family Services]. If, after thorough inspection, Agent B. Childress confirms your full compliance, no further action will be required. Otherwise you will be rigorousl>>></div>
-    {/if}
+
 </body>
 
 <div class="hidden use-portrait absolute left-2/4 -translate-x-2/4 top-2/4 -translate-y-2/4 text-lg text-white">
