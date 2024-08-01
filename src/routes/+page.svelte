@@ -606,7 +606,7 @@
         updateColumnDepths();
     }
 </script>
-<body class="overflow-hidden square relative mx-auto min-h-[90vh] bg-green-950 bg-opacity-60">
+<body class="overflow-hidden square relative mx-auto min-h-[88vh] bg-green-950 bg-opacity-60">
     {#if showMenu}
     <div transition:fly={{ x:400, duration:300}} class="overflow-hidden w-[350px] h-screen absolute right-0 bg-blue-950 bg-opacity-[98%] z-20 border-l-4 border-blue-100">
         <button on:click={() => {showMenu = false;}} class="text-4xl mt-12 ml-4 w-full border-y border-blue-200 hover:bg-blue-700 active:bg-blue-900 text-blue-100">Close --></button>
@@ -663,9 +663,9 @@
     </div>
     <!-- left right down buttons -->
     <div class="grid grid-cols-3 grid-rows-1 w-[71%] gap-x-4 max-w-[540px] mx-auto xl:hidden h-[10%] py-4">
-        <button on:click={leftClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">left</button>
-        <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">down</button>
-        <button on:click={rightClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">right</button>
+        <button on:click={leftClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8592</button>
+        <button on:click={downClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8595</button>
+        <button on:click={rightClick} class="bg-green-600 rounded-2xl text-2xl h-full active:bg-green-400 border border-white">&#8594</button>
     </div>
     {#if gameOver && score < 200}
     <div class="absolute top-[300px] left-2/4 -translate-x-2/4 border border-black bg-red-500 text-black text-4xl px-4">Game Over</div>
@@ -682,7 +682,7 @@
     }
     .square {
       width: 100vw;
-      height: 90vh;
+      height: 88vh;
     }
 
     @media (min-width: 800px) {
